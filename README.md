@@ -321,8 +321,8 @@ The application utilizes Razor Views styled completely from scratch using vanill
 
 ## 📄 License
 
-© 2026 Dopamine Detox Ledger — Abdelrahman Ashraf — Assiut University. 
-Developed for academic purposes as part of a university software engineering course.
+© 2026 Dopamine Detox Ledger
+
 
 ---
 
