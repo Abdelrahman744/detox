@@ -1,0 +1,719 @@
+/* ============================================
+   DOPAMINE DETOX LEDGER — SPOTIFY THEME
+   Font: Inter
+   Colors: Dark backgrounds, Spotify Green accent
+   ============================================ */
+
+/* === RESET & BASE === */
+:root {
+    --bg-base: #121212;
+    --bg-elevated: #181818;
+    --bg-highlight: #282828;
+    --text-base: #b3b3b3;
+    --text-bright: #ffffff;
+    --accent: #1db954;
+    --accent-hover: #1ed760;
+    --danger: #e22134;
+    --border: #333333;
+}
+
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--bg-base);
+    color: var(--text-base);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+a {
+    color: var(--text-bright);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--accent);
+}
+
+/* === HEADER === */
+.app-header {
+    background-color: #000000;
+    padding: 1rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand {
+    color: var(--text-bright);
+    font-size: 1.25rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.brand-icon {
+    color: var(--accent);
+    font-size: 1.5rem;
+}
+
+.brand:hover {
+    color: var(--text-bright);
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.nav-link {
+    color: var(--text-base);
+}
+
+.nav-link:hover {
+    color: var(--text-bright);
+}
+
+.user-greeting {
+    color: var(--text-base);
+    font-size: 0.9rem;
+    margin-right: 0.5rem;
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    color: var(--text-base);
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+}
+
+.nav-btn:hover {
+    color: var(--text-bright);
+}
+
+.btn-accent {
+    background-color: var(--text-bright);
+    color: #000000 !important;
+    padding: 0.5rem 1.25rem;
+    border-radius: 500px;
+    font-weight: 700;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.btn-accent:hover {
+    background-color: #f0f0f0;
+    transform: scale(1.04);
+}
+
+/* === MAIN CONTAINER === */
+.main-container {
+    flex: 1;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* === BUTTONS === */
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--accent);
+    color: #000000 !important;
+    padding: 0.75rem 2rem;
+    border-radius: 500px;
+    font-weight: 700;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+    transform: scale(1.04);
+}
+
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    background-color: transparent;
+    color: var(--text-bright) !important;
+    padding: 0.75rem 2rem;
+    border-radius: 500px;
+    font-weight: 700;
+    font-size: 1rem;
+    border: 1px solid #727272;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.2s;
+}
+
+.btn-secondary:hover {
+    border-color: var(--text-bright);
+    transform: scale(1.04);
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--text-base);
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    border: none;
+}
+
+.btn-ghost:hover {
+    color: var(--text-bright);
+}
+
+/* === PAGE HEADER === */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.page-title {
+    color: var(--text-bright);
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 0.25rem;
+}
+
+.page-subtitle {
+    color: var(--text-base);
+    font-size: 1rem;
+}
+
+/* === HOME HERO === */
+.hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 4rem 0;
+}
+
+.hero-badge {
+    display: inline-block;
+    background-color: var(--bg-highlight);
+    color: var(--text-bright);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 0.3rem 0.75rem;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+}
+
+.hero-title {
+    font-size: 4.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -2px;
+    color: var(--text-bright);
+    margin-bottom: 1.5rem;
+}
+
+.hero-title .accent {
+    color: var(--accent);
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    max-width: 600px;
+    margin: 0 auto 3rem;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 5rem;
+}
+
+.hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    width: 100%;
+    max-width: 900px;
+}
+
+.stat-card {
+    background-color: var(--bg-elevated);
+    padding: 2rem;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+}
+
+.stat-card:hover {
+    background-color: var(--bg-highlight);
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.stat-label {
+    color: var(--text-bright);
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.stat-desc {
+    font-size: 0.9rem;
+}
+
+/* === DATA TABLE (Archive) === */
+.table-wrapper {
+    background-color: var(--bg-elevated);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.data-table th {
+    color: var(--text-base);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.data-table td {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+
+.data-table tbody tr {
+    transition: background-color 0.2s;
+}
+
+.data-table tbody tr:hover {
+    background-color: var(--bg-highlight);
+}
+
+.cell-date {
+    color: var(--text-bright);
+    font-weight: 500;
+}
+
+.activity-badge {
+    display: inline-block;
+    background-color: var(--bg-highlight);
+    color: var(--text-bright);
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.cell-duration {
+    font-variant-numeric: tabular-nums;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.status-badge.success {
+    color: var(--accent);
+    background-color: rgba(29, 185, 84, 0.1);
+}
+
+.status-badge.failure {
+    color: var(--danger);
+    background-color: rgba(226, 33, 52, 0.1);
+}
+
+.cell-reflection {
+    font-size: 0.9rem;
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.action-btn {
+    background: transparent;
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+.action-btn.edit {
+    color: var(--text-bright);
+}
+
+.action-btn.edit:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.action-btn.delete {
+    color: var(--text-base);
+}
+
+.action-btn.delete:hover {
+    color: var(--danger);
+    background-color: rgba(226, 33, 52, 0.1);
+}
+
+/* === EMPTY STATE === */
+.empty-state {
+    background-color: var(--bg-elevated);
+    border-radius: 8px;
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    color: var(--text-bright);
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* === FORMS (Terminal) === */
+.form-card {
+    background-color: var(--bg-elevated);
+    border-radius: 8px;
+    padding: 2.5rem;
+    max-width: 700px;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    color: var(--text-bright);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.form-label .optional {
+    color: var(--text-base);
+    font-weight: 400;
+    font-size: 0.8rem;
+}
+
+.form-input {
+    width: 100%;
+    background-color: var(--bg-highlight);
+    border: 1px solid transparent;
+    color: var(--text-bright);
+    font-family: inherit;
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #727272;
+    background-color: #333333;
+}
+
+.form-input::placeholder {
+    color: #727272;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+select.form-input {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M2.5 4.5L6 8L9.5 4.5' stroke='%23b3b3b3' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+}
+
+.form-actions {
+    margin-top: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* === VALIDATION === */
+.validation-msg {
+    color: var(--danger);
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: block;
+    margin-top: 0.4rem;
+}
+
+.validation-summary {
+    background-color: rgba(226, 33, 52, 0.1);
+    border: 1px solid rgba(226, 33, 52, 0.2);
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    color: var(--danger);
+    font-size: 0.9rem;
+}
+
+.validation-summary ul {
+    margin-left: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.validation-summary:empty {
+    display: none;
+}
+
+/* === FOOTER === */
+.app-footer {
+    padding: 2rem;
+    text-align: center;
+    font-size: 0.8rem;
+    margin-top: auto;
+}
+
+/* === IDENTITY PAGES OVERRIDE (BOOTSTRAP SHIM) === */
+/* Style the scaffolded Identity pages which use Bootstrap classes */
+
+/* Layout & Containers */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: center;
+}
+.col-md-4, .col-md-6 {
+    flex: 1;
+    min-width: 300px;
+    max-width: 500px;
+    background-color: var(--bg-elevated);
+    padding: 2.5rem;
+    border-radius: 8px;
+    margin-top: 2rem;
+}
+
+/* Typography */
+h1, h2 {
+    color: var(--text-bright);
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+h3 {
+    color: var(--text-base);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+hr {
+    border: 0;
+    border-top: 1px solid var(--border);
+    margin: 1.5rem 0;
+}
+p {
+    color: var(--text-base);
+    margin-bottom: 1rem;
+}
+
+/* Forms & Inputs */
+.form-floating, .mb-3 {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+.form-label {
+    display: block;
+    color: var(--text-bright);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+.form-control,
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    display: block;
+    width: 100%;
+    background-color: var(--bg-highlight);
+    border: 1px solid transparent;
+    color: var(--text-bright);
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    font-family: inherit;
+    font-size: 1rem;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+.form-control:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+    outline: none;
+    border-color: #727272;
+    background-color: #333333;
+}
+.form-floating label {
+    display: none; /* Hide floating labels to simplify, rely on placeholders or basic labels */
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.75rem 2rem;
+    border-radius: 500px;
+    font-weight: 700;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+}
+.w-100 {
+    width: 100%;
+}
+.btn-primary, .btn-lg {
+    background-color: var(--accent);
+    color: #000000 !important;
+}
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+    transform: scale(1.02);
+}
+
+/* Checkboxes */
+.form-check {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+.form-check-input {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--accent);
+}
+.form-check-label {
+    color: var(--text-base);
+    font-size: 0.9rem;
+}
+
+/* Links inside Auth */
+#forgot-password, #resend-confirmation, #register {
+    color: var(--accent);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+#forgot-password:hover, #resend-confirmation:hover, #register:hover {
+    color: var(--text-bright);
+    text-decoration: underline;
+}
+
+/* Validation */
+.text-danger {
+    color: var(--danger);
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: block;
+    margin-top: 0.4rem;
+}
+.validation-summary-errors, .validation-summary-valid {
+    background-color: rgba(226, 33, 52, 0.1);
+    border: 1px solid rgba(226, 33, 52, 0.2);
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    color: var(--danger);
+    font-size: 0.9rem;
+}
+.validation-summary-valid {
+    display: none;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .hero-title {
+        font-size: 3rem;
+    }
+
+    .hero-stats {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}

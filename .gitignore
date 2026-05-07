@@ -1,0 +1,13 @@
+[bB]in/
+[oO]bj/
+app.db
+app.db-shm
+app.db-wal
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+appsettings.Development.json
+*.log
+.DS_Store

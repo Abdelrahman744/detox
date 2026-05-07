@@ -1,0 +1,71 @@
+@model IEnumerable<detox.Models.FocusBlock>
+
+@{
+    ViewData["Title"] = "The Archive";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">The Archive</h1>
+        <p class="page-subtitle">Your logged focus blocks</p>
+    </div>
+    <a asp-action="Create" class="btn-primary">
+        <span>+ Log New Block</span>
+    </a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <h3>No blocks logged yet</h3>
+        <p>Start logging your dopamine detox sessions to build your archive.</p>
+        <a asp-action="Create" class="btn-primary" style="margin-top:1rem;">Log Your First Block</a>
+    </div>
+}
+else
+{
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Activity Restricted</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                    <th>Reflection</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="cell-date">@item.Date.ToString("MMM dd, yyyy")</td>
+                        <td><span class="activity-badge">@item.ActivityRestricted</span></td>
+                        <td class="cell-duration">@item.DurationValue @item.DurationUnit</td>
+                        <td>
+                            @if (item.SuccessStatus)
+                            {
+                                <span class="status-badge success">✓ Maintained</span>
+                            }
+                            else
+                            {
+                                <span class="status-badge failure">✗ Broken</span>
+                            }
+                        </td>
+                        <td class="cell-reflection">@(item.Reflection ?? "—")</td>
+                        <td class="cell-actions">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn edit">Edit</a>
+                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display:inline;"
+                                  onsubmit="return confirm('Delete this block?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="action-btn delete">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

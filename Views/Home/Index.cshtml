@@ -1,0 +1,35 @@
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="hero">
+    <div class="hero-content">
+        <div class="hero-badge">FOCUS TRACKING</div>
+        <h1 class="hero-title">Dopamine Detox<br/><span class="accent">Ledger</span></h1>
+        <p class="hero-subtitle">Track your deep-work sessions. Log your restrictions. Build discipline through data.</p>
+        <div class="hero-actions">
+            <a asp-controller="FocusBlocks" asp-action="Index" class="btn-primary">
+                <span>Enter the Archive</span>
+                <span class="btn-arrow">→</span>
+            </a>
+            <a asp-area="Identity" asp-page="/Account/Register" class="btn-secondary">Get Started</a>
+        </div>
+    </div>
+    <div class="hero-stats">
+        <div class="stat-card">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-label">Track</div>
+            <div class="stat-desc">Focus Blocks</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📊</div>
+            <div class="stat-label">Log</div>
+            <div class="stat-desc">Restrictions</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-label">Review</div>
+            <div class="stat-desc">Your Progress</div>
+        </div>
+    </div>
+</div>
