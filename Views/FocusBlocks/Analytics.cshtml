@@ -1,0 +1,46 @@
+@{
+    ViewData["Title"] = "Analytics";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Insights</h1>
+        <p class="page-subtitle">Your deep work and detox metrics</p>
+    </div>
+    <a asp-action="Index" class="btn-secondary">
+        Back to Archive
+    </a>
+</div>
+
+<div class="hero" style="padding: 2rem 0;">
+    <div class="hero-stats">
+        
+        <div class="stat-card">
+            <div class="stat-icon" style="color: var(--accent);">⚡</div>
+            <div class="stat-label">Win Rate</div>
+            <div class="stat-desc" style="font-size: 2.5rem; font-weight: 800; color: var(--text-bright);">
+                @ViewBag.WinRate%
+            </div>
+            <p class="stat-desc">Success across @ViewBag.TotalBlocks total blocks</p>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon" style="color: var(--text-bright);">⏳</div>
+            <div class="stat-label">Total Time Locked In</div>
+            <div class="stat-desc" style="font-size: 2.5rem; font-weight: 800; color: var(--text-bright);">
+                @ViewBag.TotalHours <span style="font-size: 1rem;">hrs</span>
+            </div>
+            <p class="stat-desc">Normalized aggregate duration</p>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon" style="color: var(--danger);">🎯</div>
+            <div class="stat-label">Nemesis Activity</div>
+            <div class="stat-desc" style="font-size: 1.5rem; font-weight: 700; color: var(--text-bright); margin-top: 1rem;">
+                @ViewBag.Nemesis
+            </div>
+            <p class="stat-desc" style="margin-top: 0.5rem;">Most frequent point of failure</p>
+        </div>
+
+    </div>
+</div>

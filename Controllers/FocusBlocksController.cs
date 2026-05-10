@@ -131,4 +131,50 @@ public class FocusBlocksController : Controller
     {
         return _context.FocusBlocks.Any(e => e.Id == id);
     }
+
+
+
+
+
+
+    // GET: FocusBlocks/Analytics
+public async Task<IActionResult> Analytics()
+{
+    var userId = _userManager.GetUserId(User);
+    
+    // Fetch only this user's data
+    var blocks = await _context.FocusBlocks
+        .Where(f => f.UserId == userId)
+        .ToListAsync();
+
+    // 1. Calculate Win Rate
+    var totalBlocks = blocks.Count;
+    var successfulBlocks = blocks.Count(b => b.SuccessStatus);
+    var winRate = totalBlocks > 0 ? Math.Round((double)successfulBlocks / totalBlocks * 100, 1) : 0;
+
+    // 2. Calculate Total Hours (Normalizing the different Duration Units)
+    decimal totalHours = 0;
+    foreach (var b in blocks)
+    {
+        if (b.DurationUnit == "Hours") totalHours += b.DurationValue;
+        else if (b.DurationUnit == "Days") totalHours += b.DurationValue * 24;
+        else if (b.DurationUnit == "Months") totalHours += b.DurationValue * 720;
+        else if (b.DurationUnit == "Seconds") totalHours += b.DurationValue / 3600;
+    }
+
+    // 3. Find the "Nemesis" (The activity failed most often)
+    var nemesis = blocks.Where(b => !b.SuccessStatus)
+                        .GroupBy(b => b.ActivityRestricted)
+                        .OrderByDescending(g => g.Count())
+                        .Select(g => g.Key)
+                        .FirstOrDefault() ?? "None. Unbreakable.";
+
+    // Pass data to the view using ViewBag
+    ViewBag.TotalBlocks = totalBlocks;
+    ViewBag.WinRate = winRate;
+    ViewBag.TotalHours = Math.Round(totalHours, 1);
+    ViewBag.Nemesis = nemesis;
+
+    return View();
+}
 }
