@@ -696,6 +696,53 @@ input[type="password"]:focus {
     display: none;
 }
 
+/* === MODAL === */
+.custom-modal {
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0;
+    margin: auto;
+    color: var(--text-base);
+    max-width: 400px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.custom-modal::backdrop {
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    padding: 2rem;
+}
+
+.modal-content h3 {
+    color: var(--text-bright);
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+}
+
+.modal-content p {
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.btn-primary.danger {
+    background-color: var(--danger);
+    color: white !important;
+}
+
+.btn-primary.danger:hover {
+    background-color: #ff3344;
+}
+
 /* === RESPONSIVE === */
 @media (max-width: 768px) {
     .page-header {
