@@ -53,6 +53,7 @@ detox/
 │   └── ErrorViewModel.cs           # Error handling model
 ├── Views/
 │   ├── FocusBlocks/
+│   │   ├── Analytics.cshtml        # Analytics Dashboard
 │   │   ├── Create.cshtml           # "The Terminal" Create Form
 │   │   ├── Edit.cshtml             # "The Terminal" Edit Form
 │   │   └── Index.cshtml            # "The Archive" Data Table
@@ -150,6 +151,7 @@ graph TB
         P4["2.2 Log Block (Create)"]
         P5["2.3 Update Block (Edit)"]
         P6["2.4 Remove Block (Delete)"]
+        P7["2.5 View Analytics"]
     end
 
     DB_User[("AspNetUsers Table")]
@@ -165,9 +167,13 @@ graph TB
     User -->|"Session Data"| P4
     User -->|"Session Data"| P5
     User -->|"Block Id"| P6
+    User -->|"Request"| P7
 
     P3 -->|"SELECT WHERE UserId"| DB_Blocks
     P3 -->|"HTML Table"| User
+
+    P7 -->|"SELECT WHERE UserId"| DB_Blocks
+    P7 -->|"Render Dashboard"| User
 
     P4 -->|"INSERT"| DB_Blocks
     P5 -->|"UPDATE"| DB_Blocks
@@ -266,10 +272,10 @@ Since this is an MVC application returning HTML (not a JSON API), the routing sy
 | GET | `/FocusBlocks` | List all blocks for the current user | `FocusBlocks/Index.cshtml` |
 | GET | `/FocusBlocks/Create` | Show the "Log New Block" form | `FocusBlocks/Create.cshtml` |
 | POST | `/FocusBlocks/Create` | Validate and insert new block into DB | — (Redirects to Index) |
+| GET | `/FocusBlocks/Analytics` | View personal stats, win rate, and total hours | `FocusBlocks/Analytics.cshtml` |
 | GET | `/FocusBlocks/Edit/{id}` | Show the "Edit Block" form | `FocusBlocks/Edit.cshtml` |
 | POST | `/FocusBlocks/Edit/{id}` | Validate and update existing block | — (Redirects to Index) |
-| GET | `/FocusBlocks/Delete/{id}` | Show delete confirmation screen | `FocusBlocks/Delete.cshtml` |
-| POST | `/FocusBlocks/Delete/{id}` | Execute delete from DB | — (Redirects to Index) |
+| POST | `/FocusBlocks/Delete/{id}` | Execute delete from DB via Custom Modal | — (Redirects to Index) |
 
 ---
 
@@ -278,8 +284,9 @@ Since this is an MVC application returning HTML (not a JSON API), the routing sy
 The application utilizes Razor Views styled completely from scratch using vanilla CSS, abandoning Bootstrap to enforce a strict, premium aesthetic.
 
 1. **Home / Hero Page**: Features a massive typographic header, dynamic stat cards, and clear Call-To-Action buttons to enter the app.
-2. **The Archive (Dashboard)**: A sleek data table displaying logs with dynamic color-coded badges for activity types and success/failure statuses.
-3. **The Terminal (Forms)**: Form inputs styled as floating dark-mode elements. Includes dynamic layout using CSS Flexbox/Grid for duration value and unit pairing.
+2. **The Archive (Dashboard)**: A sleek data table displaying logs with dynamic color-coded badges for activity types and success/failure statuses. Uses a custom dark-mode `<dialog>` modal for deletion.
+3. **Analytics Dashboard**: Calculates and displays the user's lifetime focus statistics (Win Rate, Total Time Logged, and their biggest "Nemesis").
+4. **The Terminal (Forms)**: Form inputs styled as floating dark-mode elements. Includes dynamic layout using CSS Flexbox/Grid for duration value and unit pairing.
 
 ---
 
