@@ -1,0 +1,139 @@
+@model List<detox.ViewModels.HabitCardViewModel>
+
+@{
+    ViewData["Title"] = "My Habits";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">My Habits</h1>
+        <p class="page-subtitle">@Model.Count active habit@(Model.Count == 1 ? "" : "s") tracked</p>
+    </div>
+    <a asp-action="Create" class="btn-primary" id="habits-create-btn">＋ New Habit</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="empty-state" id="habits-empty">
+        <span class="empty-icon">🌱</span>
+        <h3>No habits yet</h3>
+        <p>Define your first habit to start tracking streaks and building consistency.</p>
+        <a asp-action="Create" class="btn-primary" id="habits-empty-create-btn">Create Your First Habit</a>
+    </div>
+}
+else
+{
+    <div class="habit-grid" id="habit-grid">
+        @foreach (var card in Model)
+        {
+            <div class="habit-card @(card.CompletedToday ? "habit-card--done" : "") @(!card.DueToday ? "habit-card--skip" : "")"
+                 id="habit-card-@card.Habit.Id"
+                 style="--habit-color: @card.Habit.Color;">
+
+                <div class="habit-card__top">
+                    <div class="habit-card__icon">@card.Habit.Icon</div>
+                    <div class="habit-card__meta">
+                        <div class="habit-card__name">@card.Habit.Name</div>
+                        <span class="category-badge">@card.Habit.Category</span>
+                    </div>
+                    <div class="habit-card__menu">
+                        <a asp-action="Edit" asp-route-id="@card.Habit.Id" class="action-btn edit" title="Edit">✎</a>
+                        <form asp-action="Archive" asp-route-id="@card.Habit.Id" method="post" style="display:inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="action-btn delete" title="Archive"
+                                    onclick="return confirm('Archive this habit?')">🗂</button>
+                        </form>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(card.Habit.Description))
+                {
+                    <p class="habit-card__desc">@card.Habit.Description</p>
+                }
+
+                <div class="habit-card__stats">
+                    <div class="streak-chip @(card.Streak.CurrentStreak >= 3 ? "streak-chip--fire" : "")">
+                        @(card.Streak.CurrentStreak >= 3 ? "🔥" : "📅")
+                        @card.Streak.CurrentStreak day streak
+                    </div>
+                    <div class="habit-rate">@card.Streak.CompletionRate30.ToString("F0")% / 30d</div>
+                </div>
+
+                @if (card.DueToday)
+                {
+                    <form asp-action="CheckIn" asp-route-id="@card.Habit.Id" method="post"
+                          class="checkin-form" data-habit-id="@card.Habit.Id">
+                        @Html.AntiForgeryToken()
+                        @if (card.Habit.IsMeasurable)
+                        {
+                            <div class="measurable-row">
+                                <input type="number" name="value" step="any" min="0"
+                                       class="form-input measurable-input"
+                                       placeholder="@card.Habit.TargetUnit"
+                                       value="@card.TodayLog?.Value" />
+                            </div>
+                        }
+                        <button type="button"
+                                class="habit-check-btn @(card.CompletedToday ? "habit-check-btn--done" : "")"
+                                onclick="checkIn(@card.Habit.Id, this)"
+                                id="check-btn-@card.Habit.Id">
+                            @if (card.CompletedToday)
+                            {
+                                <span class="check-icon">✓</span><span>Done</span>
+                            }
+                            else
+                            {
+                                <span class="check-icon">○</span><span>Mark Done</span>
+                            }
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <div class="not-due-badge">Rest day ·  @card.Habit.Frequency</div>
+                }
+            </div>
+        }
+    </div>
+}
+
+@section Scripts {
+<script>
+async function checkIn(habitId, btn) {
+    const form = document.querySelector(`.checkin-form[data-habit-id="${habitId}"]`);
+    const token = form.querySelector('[name="__RequestVerificationToken"]').value;
+    const valueInput = form.querySelector('[name="value"]');
+    const body = new URLSearchParams({ __RequestVerificationToken: token });
+    if (valueInput) body.append('value', valueInput.value);
+
+    btn.disabled = true;
+    const res = await fetch(`/Habits/CheckIn/${habitId}`, { method: 'POST', body });
+    const data = await res.json();
+
+    const card = document.getElementById(`habit-card-${habitId}`);
+    const checkIcon = btn.querySelector('.check-icon');
+    const checkText = btn.querySelector('span:last-child');
+
+    if (data.completed) {
+        card.classList.add('habit-card--done');
+        btn.classList.add('habit-check-btn--done');
+        checkIcon.textContent = '✓';
+        checkText.textContent = 'Done';
+    } else {
+        card.classList.remove('habit-card--done');
+        btn.classList.remove('habit-check-btn--done');
+        checkIcon.textContent = '○';
+        checkText.textContent = 'Mark Done';
+    }
+
+    // Update streak chip
+    const chip = card.querySelector('.streak-chip');
+    if (chip) {
+        chip.textContent = (data.currentStreak >= 3 ? '🔥 ' : '📅 ') + data.currentStreak + ' day streak';
+        chip.classList.toggle('streak-chip--fire', data.currentStreak >= 3);
+    }
+
+    btn.disabled = false;
+}
+</script>
+}

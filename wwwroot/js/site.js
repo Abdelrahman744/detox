@@ -1,4 +1,12 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+// site.js — Dopamine Detox Ledger
 
-// Write your JavaScript code.
+// Scroll-based header shadow
+window.addEventListener('scroll', () => {
+    const header = document.getElementById('app-header');
+    if (!header) return;
+    if (window.scrollY > 10) {
+        header.style.boxShadow = '0 4px 30px rgba(0,0,0,0.5)';
+    } else {
+        header.style.boxShadow = 'none';
+    }
+}, { passive: true });

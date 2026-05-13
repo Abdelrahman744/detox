@@ -3,34 +3,63 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Dopamine Detox Ledger — Track your deep-work sessions, log restrictions, and build discipline through data." />
     <title>@ViewData["Title"] — Dopamine Detox Ledger</title>
     <script type="importmap"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/detox.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header class="app-header">
+    <header class="app-header" id="app-header">
         <div class="header-inner">
             <a asp-area="" asp-controller="Home" asp-action="Index" class="brand">
-                <span class="brand-icon">◉</span> Detox Ledger
+                <span class="brand-icon">◉</span>
+                <span class="brand-text">Detox Ledger</span>
             </a>
-            <nav class="nav-links">
-                <a asp-area="" asp-controller="FocusBlocks" asp-action="Index" class="nav-link">Archive</a>
+            <nav class="nav-links" aria-label="Main navigation">
+                @{
+                    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+                    var action = ViewContext.RouteData.Values["action"]?.ToString();
+                }
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <a asp-area="" asp-controller="Home" asp-action="Index"
+                       class="nav-link @(controller == "Home" && action == "Index" ? "nav-link--active" : "")">
+                        Today
+                    </a>
+                    <a asp-area="" asp-controller="Habits" asp-action="Index"
+                       class="nav-link @(controller == "Habits" && action == "Index" ? "nav-link--active" : "")">
+                        Habits
+                    </a>
+                    <a asp-area="" asp-controller="Habits" asp-action="Analytics"
+                       class="nav-link @(controller == "Habits" && action == "Analytics" ? "nav-link--active" : "")">
+                        Analytics
+                    </a>
+                    <a asp-area="" asp-controller="Habits" asp-action="Create"
+                       class="nav-link nav-link-add @(controller == "Habits" && action == "Create" ? "nav-link--active" : "")">
+                        <span class="nav-link-icon">＋</span> Log
+                    </a>
+                }
                 <partial name="_LoginPartial" />
             </nav>
         </div>
     </header>
 
     <div class="main-container">
-        <main role="main">
+        <main role="main" id="main-content">
             @RenderBody()
         </main>
     </div>
 
-
+    <footer class="app-footer">
+        <div class="footer-inner">
+            <span class="footer-brand"><span class="brand-icon-sm">◉</span> Detox Ledger</span>
+            <span class="footer-copy">Built for focus. Powered by discipline.</span>
+        </div>
+    </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

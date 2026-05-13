@@ -1,35 +1,149 @@
+@model detox.ViewModels.DashboardViewModel
+
 @{
-    ViewData["Title"] = "Home";
+    ViewData["Title"] = "Today";
+    var pct = Model.TodayRate;
 }
 
-<div class="hero">
-    <div class="hero-content">
-        <div class="hero-badge">FOCUS TRACKING</div>
-        <h1 class="hero-title">Dopamine Detox<br/><span class="accent">Ledger</span></h1>
-        <p class="hero-subtitle">Track your deep-work sessions. Log your restrictions. Build discipline through data.</p>
-        <div class="hero-actions">
-            <a asp-controller="FocusBlocks" asp-action="Index" class="btn-primary">
-                <span>Enter the Archive</span>
-                <span class="btn-arrow">→</span>
-            </a>
-            <a asp-area="Identity" asp-page="/Account/Register" class="btn-secondary">Get Started</a>
-        </div>
+<div class="dashboard-header" id="dashboard-header">
+    <div>
+        <h1 class="page-title">Today</h1>
+        <p class="page-subtitle">@DateTime.Today.ToString("dddd, MMMM d")</p>
     </div>
-    <div class="hero-stats">
-        <div class="stat-card">
-            <div class="stat-icon">🎯</div>
-            <div class="stat-label">Track</div>
-            <div class="stat-desc">Focus Blocks</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon">📊</div>
-            <div class="stat-label">Log</div>
-            <div class="stat-desc">Restrictions</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon">✅</div>
-            <div class="stat-label">Review</div>
-            <div class="stat-desc">Your Progress</div>
-        </div>
+    <a asp-controller="Habits" asp-action="Create" class="btn-primary" id="dashboard-add-btn">＋ New Habit</a>
+</div>
+
+<!-- Daily progress bar -->
+<div class="daily-progress-wrap" id="daily-progress">
+    <div class="daily-progress-meta">
+        <span>@Model.CompletedToday / @Model.DueToday habits done</span>
+        <span class="daily-pct">@pct.ToString("F0")%</span>
+    </div>
+    <div class="daily-progress-track">
+        <div class="daily-progress-fill" id="daily-fill" style="width:0%"
+             data-target="@pct.ToString("F1")"></div>
     </div>
 </div>
+
+@if (!Model.TodayHabits.Any())
+{
+    <div class="empty-state" id="dashboard-empty">
+        <span class="empty-icon">🌱</span>
+        <h3>No habits defined yet</h3>
+        <p>Create your first habit to start building consistency.</p>
+        <a asp-controller="Habits" asp-action="Create" class="btn-primary" id="dashboard-empty-btn">Create First Habit</a>
+    </div>
+}
+else
+{
+    <div class="habit-grid" id="dashboard-habit-grid">
+        @foreach (var card in Model.TodayHabits)
+        {
+            <div class="habit-card @(card.CompletedToday ? "habit-card--done" : "") @(!card.DueToday ? "habit-card--skip" : "")"
+                 id="habit-card-@card.Habit.Id"
+                 style="--habit-color: @card.Habit.Color">
+
+                <div class="habit-card__top">
+                    <div class="habit-card__icon">@card.Habit.Icon</div>
+                    <div class="habit-card__meta">
+                        <div class="habit-card__name">@card.Habit.Name</div>
+                        <span class="category-badge">@card.Habit.Category</span>
+                    </div>
+                    @if (card.Streak.CurrentStreak > 0)
+                    {
+                        <div class="streak-chip @(card.Streak.CurrentStreak >= 3 ? "streak-chip--fire" : "")">
+                            @(card.Streak.CurrentStreak >= 3 ? "🔥" : "📅") @card.Streak.CurrentStreak
+                        </div>
+                    }
+                </div>
+
+                @if (card.DueToday)
+                {
+                    <form asp-controller="Habits" asp-action="CheckIn" asp-route-id="@card.Habit.Id"
+                          method="post" class="checkin-form" data-habit-id="@card.Habit.Id">
+                        @Html.AntiForgeryToken()
+                        @if (card.Habit.IsMeasurable)
+                        {
+                            <div class="measurable-row">
+                                <input type="number" name="value" step="any" min="0"
+                                       class="form-input measurable-input"
+                                       placeholder="@card.Habit.TargetUnit"
+                                       value="@card.TodayLog?.Value" />
+                            </div>
+                        }
+                        <button type="button"
+                                class="habit-check-btn @(card.CompletedToday ? "habit-check-btn--done" : "")"
+                                onclick="checkIn(@card.Habit.Id, this)"
+                                id="check-btn-@card.Habit.Id">
+                            <span class="check-icon">@(card.CompletedToday ? "✓" : "○")</span>
+                            <span>@(card.CompletedToday ? "Done!" : "Mark Done")</span>
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <div class="not-due-badge">Rest day · @card.Habit.Frequency</div>
+                }
+            </div>
+        }
+    </div>
+}
+
+@section Scripts {
+<script>
+// Animate progress bar on load
+document.addEventListener('DOMContentLoaded', () => {
+    const fill = document.getElementById('daily-fill');
+    if (fill) setTimeout(() => { fill.style.width = fill.dataset.target + '%'; }, 100);
+});
+
+let completedCount = @Model.CompletedToday;
+let dueCount = @Model.DueToday;
+
+async function checkIn(habitId, btn) {
+    const form = document.querySelector(`.checkin-form[data-habit-id="${habitId}"]`);
+    const token = form.querySelector('[name="__RequestVerificationToken"]').value;
+    const valueInput = form.querySelector('[name="value"]');
+    const body = new URLSearchParams({ __RequestVerificationToken: token });
+    if (valueInput) body.append('value', valueInput.value);
+
+    btn.disabled = true;
+    const res = await fetch(`/Habits/CheckIn/${habitId}`, { method: 'POST', body });
+    const data = await res.json();
+
+    const card = document.getElementById(`habit-card-${habitId}`);
+    const icon = btn.querySelector('.check-icon');
+    const text = btn.querySelector('span:last-child');
+
+    if (data.completed) {
+        completedCount++;
+        card.classList.add('habit-card--done');
+        btn.classList.add('habit-check-btn--done');
+        icon.textContent = '✓'; text.textContent = 'Done!';
+    } else {
+        completedCount = Math.max(0, completedCount - 1);
+        card.classList.remove('habit-card--done');
+        btn.classList.remove('habit-check-btn--done');
+        icon.textContent = '○'; text.textContent = 'Mark Done';
+    }
+
+    // Update streak chip
+    const chip = card.querySelector('.streak-chip');
+    if (chip) {
+        chip.textContent = (data.currentStreak >= 3 ? '🔥 ' : '📅 ') + data.currentStreak;
+        chip.classList.toggle('streak-chip--fire', data.currentStreak >= 3);
+    }
+
+    // Update progress bar
+    const pct = dueCount > 0 ? Math.round(completedCount / dueCount * 100) : 0;
+    const fill = document.getElementById('daily-fill');
+    const pctEl = document.querySelector('.daily-pct');
+    const metaEl = document.querySelector('.daily-progress-meta span');
+    if (fill) fill.style.width = pct + '%';
+    if (pctEl) pctEl.textContent = pct + '%';
+    if (metaEl) metaEl.textContent = completedCount + ' / ' + dueCount + ' habits done';
+
+    btn.disabled = false;
+}
+</script>
+}

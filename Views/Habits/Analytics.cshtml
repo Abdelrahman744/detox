@@ -1,0 +1,145 @@
+@model detox.ViewModels.AnalyticsViewModel
+
+@{
+    ViewData["Title"] = "Analytics";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Analytics</h1>
+        <p class="page-subtitle">Performance across all your habits</p>
+    </div>
+    <a asp-action="Index" class="btn-secondary" id="analytics-back-btn">← My Habits</a>
+</div>
+
+<!-- Global summary row -->
+<div class="analytics-summary" id="analytics-summary">
+    <div class="summary-card">
+        <div class="summary-value" id="total-habits-val">@Model.TotalHabits</div>
+        <div class="summary-label">Active Habits</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-value">@Model.OverallRate30.ToString("F0")<span class="unit">%</span></div>
+        <div class="summary-label">30-Day Rate</div>
+    </div>
+    <div class="summary-card summary-card--accent">
+        <div class="summary-icon">🏆</div>
+        <div class="summary-label-sm">Most Consistent</div>
+        <div class="summary-name">@Model.MostConsistent</div>
+    </div>
+    <div class="summary-card summary-card--danger">
+        <div class="summary-icon">⚠️</div>
+        <div class="summary-label-sm">Needs Attention</div>
+        <div class="summary-name">@Model.Nemesis</div>
+    </div>
+</div>
+
+@if (!Model.Habits.Any())
+{
+    <div class="empty-state">
+        <span class="empty-icon">📊</span>
+        <h3>No habits to analyze yet</h3>
+        <p>Create some habits and start checking in to see your data here.</p>
+        <a asp-controller="Habits" asp-action="Create" class="btn-primary">Create a Habit</a>
+    </div>
+}
+else
+{
+    <div class="habit-analytics-list" id="habit-analytics-list">
+        @foreach (var card in Model.Habits)
+        {
+            var s = card.Streak;
+            double circ = 2 * Math.PI * 28;
+            double offset = circ - (s.CompletionRate30 / 100.0 * circ);
+
+            <div class="analytics-habit-row" id="analytics-row-@card.Habit.Id"
+                 style="--habit-color: @card.Habit.Color">
+                <div class="analytics-habit-identity">
+                    <span class="analytics-habit-icon">@card.Habit.Icon</span>
+                    <div>
+                        <div class="analytics-habit-name">@card.Habit.Name</div>
+                        <span class="category-badge">@card.Habit.Category</span>
+                    </div>
+                </div>
+
+                <div class="analytics-stats-row">
+                    <!-- Mini progress ring -->
+                    <div class="mini-ring-wrap" title="30-day completion: @s.CompletionRate30%">
+                        <svg class="progress-ring" width="70" height="70" viewBox="0 0 70 70">
+                            <circle class="progress-ring__bg" cx="35" cy="35" r="28" stroke-width="7" fill="none"/>
+                            <circle class="progress-ring__fill" cx="35" cy="35" r="28" stroke-width="7" fill="none"
+                                    stroke-dasharray="@circ.ToString("F1")"
+                                    stroke-dashoffset="@circ.ToString("F1")"
+                                    data-target-offset="@offset.ToString("F1")" />
+                        </svg>
+                        <div class="mini-ring-label">@s.CompletionRate30.ToString("F0")%</div>
+                    </div>
+
+                    <div class="analytics-metric">
+                        <div class="analytics-metric-value @(s.CurrentStreak >= 3 ? "text-fire" : "")">
+                            @(s.CurrentStreak >= 3 ? "🔥 " : "")@s.CurrentStreak
+                        </div>
+                        <div class="analytics-metric-label">Current Streak</div>
+                    </div>
+                    <div class="analytics-metric">
+                        <div class="analytics-metric-value">@s.LongestStreak</div>
+                        <div class="analytics-metric-label">Best Streak</div>
+                    </div>
+                    <div class="analytics-metric">
+                        <div class="analytics-metric-value">@s.CompletionRate7.ToString("F0")%</div>
+                        <div class="analytics-metric-label">7-Day Rate</div>
+                    </div>
+                    <div class="analytics-metric">
+                        <div class="analytics-metric-value">@s.CompletionRateAll.ToString("F0")%</div>
+                        <div class="analytics-metric-label">All-Time</div>
+                    </div>
+                </div>
+
+                <!-- Heatmap: last 12 weeks -->
+                <div class="heatmap-wrap">
+                    @{
+                        var today = DateOnly.FromDateTime(DateTime.Today);
+                        var completedSet = s.CompletedDates.ToHashSet();
+                        // Start from 83 days ago (12 weeks), align to Monday
+                        var startDay = today.AddDays(-83);
+                    }
+                    <div class="heatmap-grid">
+                        @for (int i = 0; i <= 83; i++)
+                        {
+                            var d = startDay.AddDays(i);
+                            var done = completedSet.Contains(d);
+                            var level = done ? "heatmap-cell--done" : (d <= today ? "heatmap-cell--miss" : "heatmap-cell--future");
+                            <div class="heatmap-cell @level" title="@d.ToString("MMM dd") @(done ? "✓" : "")"></div>
+                        }
+                    </div>
+                    <div class="heatmap-legend">
+                        <span>Miss</span>
+                        <div class="heatmap-cell heatmap-cell--miss"></div>
+                        <div class="heatmap-cell heatmap-cell--done"></div>
+                        <span>Done</span>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@section Scripts {
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.progress-ring__fill').forEach(ring => {
+        const target = parseFloat(ring.dataset.targetOffset);
+        const circ   = parseFloat(ring.getAttribute('stroke-dasharray'));
+        const start  = performance.now();
+        const dur    = 1000;
+        function step(now) {
+            const p = Math.min((now - start) / dur, 1);
+            const ease = 1 - Math.pow(1 - p, 3);
+            ring.style.strokeDashoffset = circ + (target - circ) * ease;
+            if (p < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+    });
+});
+</script>
+}

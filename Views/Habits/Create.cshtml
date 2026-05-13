@@ -1,0 +1,148 @@
+@model detox.Models.Habit
+
+@{
+    ViewData["Title"] = "New Habit";
+    var categories = new[] { "Health", "Mind", "Focus", "Fitness", "Learning", "Social", "Finance", "General" };
+    var icons = new[] { "⭕","🧘","📚","🏃","💪","🥗","💧","🛌","✍️","🎯","🧠","🚫","💻","🎵","🌿" };
+    var colors = new[] { "#7c3aed","#2563eb","#10b981","#f59e0b","#ef4444","#ec4899","#06b6d4","#8b5cf6" };
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">New Habit</h1>
+        <p class="page-subtitle">Define a recurring habit to track</p>
+    </div>
+    <a asp-action="Index" class="btn-secondary" id="create-habit-back">← Back</a>
+</div>
+
+<div class="form-card" id="create-habit-card">
+    <form asp-action="Create" method="post" id="create-habit-form">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+        <div class="form-section-title">Identity</div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label asp-for="Name" class="form-label">Habit Name</label>
+                <input asp-for="Name" class="form-input" id="Name" placeholder="e.g. No Social Media" />
+                <span asp-validation-for="Name" class="validation-msg"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Category" class="form-label">Category</label>
+                <select asp-for="Category" class="form-input" id="Category">
+                    @foreach (var cat in categories)
+                    { <option value="@cat">@cat</option> }
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Description" class="form-label">Description <span class="optional">(optional)</span></label>
+            <input asp-for="Description" class="form-input" id="Description" placeholder="Why does this habit matter to you?" />
+        </div>
+
+        <div class="form-section-title">Appearance</div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Icon</label>
+                <div class="icon-picker" id="icon-picker">
+                    @foreach (var ic in icons)
+                    {
+                        <label class="icon-option">
+                            <input type="radio" name="Icon" value="@ic" @(ic == "⭕" ? "checked" : "") />
+                            <span class="icon-tile">@ic</span>
+                        </label>
+                    }
+                </div>
+                <span asp-validation-for="Icon" class="validation-msg"></span>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Accent Color</label>
+                <div class="color-picker" id="color-picker">
+                    @foreach (var col in colors)
+                    {
+                        <label class="color-option">
+                            <input type="radio" name="Color" value="@col" @(col == "#7c3aed" ? "checked" : "") />
+                            <span class="color-swatch" style="background:@col"></span>
+                        </label>
+                    }
+                </div>
+                <span asp-validation-for="Color" class="validation-msg"></span>
+            </div>
+        </div>
+
+        <div class="form-section-title">Schedule</div>
+
+        <div class="form-group">
+            <label asp-for="Frequency" class="form-label">Frequency</label>
+            <select asp-for="Frequency" class="form-input" id="Frequency" onchange="toggleCustomDays(this.value)">
+                <option value="Daily">Every day</option>
+                <option value="Weekdays">Weekdays (Mon–Fri)</option>
+                <option value="Weekends">Weekends (Sat–Sun)</option>
+                <option value="Weekly">Once a week</option>
+                <option value="Custom">Custom days</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="custom-days-group" style="display:none">
+            <label class="form-label">Select days</label>
+            <div class="day-picker">
+                @foreach (var day in new[] { "Mon","Tue","Wed","Thu","Fri","Sat","Sun" })
+                {
+                    <label class="day-option">
+                        <input type="checkbox" name="custom_days_cb" value="@day" />
+                        <span class="day-tile">@day</span>
+                    </label>
+                }
+            </div>
+            <input type="hidden" name="CustomDays" id="CustomDays" />
+        </div>
+
+        <div class="form-section-title">Measurement <span class="optional">(optional)</span></div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <input type="checkbox" asp-for="IsMeasurable" id="IsMeasurable"
+                       onchange="toggleMeasurable(this.checked)" style="accent-color:var(--accent)" />
+                Track a numeric target (e.g. "Run 5 km")
+            </label>
+        </div>
+
+        <div id="measurable-fields" style="display:none">
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="TargetValue" class="form-label">Target value</label>
+                    <input asp-for="TargetValue" class="form-input" id="TargetValue" type="number" step="any" min="0" placeholder="5" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="TargetUnit" class="form-label">Unit</label>
+                    <input asp-for="TargetUnit" class="form-input" id="TargetUnit" placeholder="km, pages, min…" />
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary" id="create-habit-submit">Create Habit</button>
+            <a asp-action="Index" class="btn-ghost">Cancel</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function toggleCustomDays(val) {
+            document.getElementById('custom-days-group').style.display = val === 'Custom' ? 'block' : 'none';
+        }
+        function toggleMeasurable(on) {
+            document.getElementById('measurable-fields').style.display = on ? 'block' : 'none';
+        }
+        // Collect custom day checkboxes into hidden input on submit
+        document.getElementById('create-habit-form').addEventListener('submit', () => {
+            const checked = [...document.querySelectorAll('[name="custom_days_cb"]:checked')].map(c => c.value);
+            document.getElementById('CustomDays').value = checked.join(',');
+        });
+    </script>
+}

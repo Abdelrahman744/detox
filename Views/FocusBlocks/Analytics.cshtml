@@ -1,5 +1,9 @@
 @{
     ViewData["Title"] = "Analytics";
+    double winRate = (double)ViewBag.WinRate;
+    // SVG progress ring: r=54, circumference = 2πr ≈ 339.3
+    double circumference = 2 * Math.PI * 54;
+    double offset = circumference - (winRate / 100.0 * circumference);
 }
 
 <div class="page-header">
@@ -7,40 +11,107 @@
         <h1 class="page-title">Insights</h1>
         <p class="page-subtitle">Your deep work and detox metrics</p>
     </div>
-    <a asp-action="Index" class="btn-secondary">
-        Back to Archive
-    </a>
+    <a asp-action="Index" class="btn-secondary" id="analytics-back-btn">← Back to Archive</a>
 </div>
 
-<div class="hero" style="padding: 2rem 0;">
-    <div class="hero-stats">
-        
-        <div class="stat-card">
-            <div class="stat-icon" style="color: var(--accent);">⚡</div>
-            <div class="stat-label">Win Rate</div>
-            <div class="stat-desc" style="font-size: 2.5rem; font-weight: 800; color: var(--text-bright);">
-                @ViewBag.WinRate%
-            </div>
-            <p class="stat-desc">Success across @ViewBag.TotalBlocks total blocks</p>
-        </div>
+<div class="analytics-grid" id="analytics-grid">
 
-        <div class="stat-card">
-            <div class="stat-icon" style="color: var(--text-bright);">⏳</div>
-            <div class="stat-label">Total Time Locked In</div>
-            <div class="stat-desc" style="font-size: 2.5rem; font-weight: 800; color: var(--text-bright);">
-                @ViewBag.TotalHours <span style="font-size: 1rem;">hrs</span>
-            </div>
-            <p class="stat-desc">Normalized aggregate duration</p>
+    <!-- Win Rate with progress ring -->
+    <div class="stat-card stat-card--featured" id="analytics-winrate-card">
+        <div class="stat-card-header">
+            <span class="stat-icon">⚡</span>
+            <span class="stat-label">Win Rate</span>
         </div>
-
-        <div class="stat-card">
-            <div class="stat-icon" style="color: var(--danger);">🎯</div>
-            <div class="stat-label">Nemesis Activity</div>
-            <div class="stat-desc" style="font-size: 1.5rem; font-weight: 700; color: var(--text-bright); margin-top: 1rem;">
-                @ViewBag.Nemesis
-            </div>
-            <p class="stat-desc" style="margin-top: 0.5rem;">Most frequent point of failure</p>
+        <div class="ring-container">
+            <svg class="progress-ring" width="130" height="130" viewBox="0 0 130 130" aria-label="Win rate @winRate%">
+                <circle class="progress-ring__bg" cx="65" cy="65" r="54"
+                        stroke-width="10" fill="none" />
+                <circle class="progress-ring__fill" cx="65" cy="65" r="54"
+                        stroke-width="10" fill="none"
+                        stroke-dasharray="@circumference.ToString("F1")"
+                        stroke-dashoffset="@circumference.ToString("F1")"
+                        data-target-offset="@offset.ToString("F1")"
+                        id="win-rate-ring" />
+            </svg>
         </div>
-
+        <div class="stat-number" id="win-rate-number" data-target="@winRate">0<span class="unit">%</span></div>
+        <p class="stat-desc">Success across <strong style="color:var(--text-bright)">@ViewBag.TotalBlocks</strong> total blocks</p>
     </div>
+
+    <!-- Total Hours -->
+    <div class="stat-card" id="analytics-hours-card">
+        <div class="stat-card-header">
+            <span class="stat-icon">⏳</span>
+            <span class="stat-label">Total Time Locked In</span>
+        </div>
+        <div class="stat-number" id="hours-number" data-target="@ViewBag.TotalHours">
+            0<span class="unit">hrs</span>
+        </div>
+        <p class="stat-desc">Normalized aggregate duration across all sessions</p>
+    </div>
+
+    <!-- Nemesis -->
+    <div class="stat-card stat-card--nemesis" id="analytics-nemesis-card">
+        <div class="stat-card-header">
+            <span class="stat-icon">🎯</span>
+            <span class="stat-label">Nemesis Activity</span>
+        </div>
+        <div class="nemesis-name" id="nemesis-name">@ViewBag.Nemesis</div>
+        <p class="stat-desc">Most frequent point of failure — study and conquer it</p>
+    </div>
+
 </div>
+
+@section Scripts {
+<script>
+// Animate counter from 0 to target
+function animateCounter(el, target, isFloat, suffix) {
+    const duration = 1200;
+    const start = performance.now();
+    function step(now) {
+        const p = Math.min((now - start) / duration, 1);
+        const ease = 1 - Math.pow(1 - p, 3);
+        const val = isFloat ? (ease * target).toFixed(1) : Math.round(ease * target);
+        el.innerHTML = val + suffix;
+        if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+}
+
+// Animate progress ring
+function animateRing(ringEl, targetOffset) {
+    const circumference = parseFloat(ringEl.getAttribute('stroke-dasharray'));
+    const start = performance.now();
+    const startOffset = circumference;
+    const duration = 1400;
+    function step(now) {
+        const p = Math.min((now - start) / duration, 1);
+        const ease = 1 - Math.pow(1 - p, 3);
+        const current = startOffset + (targetOffset - startOffset) * ease;
+        ringEl.style.strokeDashoffset = current;
+        if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Win rate ring
+    const ring = document.getElementById('win-rate-ring');
+    if (ring) animateRing(ring, parseFloat(ring.dataset.targetOffset));
+
+    // Win rate number
+    const wrEl = document.getElementById('win-rate-number');
+    if (wrEl) {
+        const t = parseFloat(wrEl.dataset.target);
+        animateCounter(wrEl, t, true, '<span class="unit">%</span>');
+    }
+
+    // Hours number
+    const hrEl = document.getElementById('hours-number');
+    if (hrEl) {
+        const t = parseFloat(hrEl.dataset.target);
+        animateCounter(hrEl, t, true, '<span class="unit">hrs</span>');
+    }
+});
+</script>
+}

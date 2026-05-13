@@ -9,27 +9,35 @@
         <h1 class="page-title">Log New Block</h1>
         <p class="page-subtitle">Record a new focus session or restriction protocol</p>
     </div>
+    <a asp-action="Index" class="btn-secondary" id="create-back-btn">← Back to Archive</a>
 </div>
 
-<div class="form-card">
-    <form asp-action="Create" method="post">
+<div class="form-card" id="create-form-card">
+    <form asp-action="Create" method="post" id="create-form">
         @Html.AntiForgeryToken()
         <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
 
+        <div class="form-section-title">Session Details</div>
+
         <div class="form-group">
-            <label asp-for="ActivityRestricted" class="form-label">Activity Restricted</label>
-            <input asp-for="ActivityRestricted" class="form-input" placeholder='e.g. Social Media, Sugar, Video Games' />
+            <label asp-for="ActivityRestricted" class="form-label">
+                <span class="form-icon">🚫</span> Activity Restricted
+            </label>
+            <input asp-for="ActivityRestricted" class="form-input" id="ActivityRestricted"
+                   placeholder="e.g. Social Media, Sugar, Video Games" />
             <span asp-validation-for="ActivityRestricted" class="validation-msg"></span>
         </div>
 
         <div class="form-row">
             <div class="form-group">
-                <label class="form-label">Duration</label>
-                <div style="display: flex; gap: 0.5rem;">
-                    <input asp-for="DurationValue" class="form-input" type="number" step="any" min="0.1" placeholder="e.g. 2.5" style="flex: 1;" />
-                    <select asp-for="DurationUnit" class="form-input" style="flex: 1;">
+                <label class="form-label"><span class="form-icon">⏱</span> Duration</label>
+                <div class="duration-row">
+                    <input asp-for="DurationValue" class="form-input" id="DurationValue"
+                           type="number" step="any" min="0.1" placeholder="e.g. 2.5" />
+                    <select asp-for="DurationUnit" class="form-input" id="DurationUnit">
                         <option value="Seconds">Seconds</option>
-                        <option value="Hours">Hours</option>
+                        <option value="Minutes">Minutes</option>
+                        <option value="Hours" selected>Hours</option>
                         <option value="Days">Days</option>
                         <option value="Months">Months</option>
                     </select>
@@ -39,15 +47,19 @@
             </div>
 
             <div class="form-group">
-                <label asp-for="Date" class="form-label">Date</label>
-                <input asp-for="Date" class="form-input" type="date" />
+                <label asp-for="Date" class="form-label"><span class="form-icon">📅</span> Date</label>
+                <input asp-for="Date" class="form-input" id="Date" type="date" />
                 <span asp-validation-for="Date" class="validation-msg"></span>
             </div>
         </div>
 
+        <div class="form-section-title" style="margin-top: 0.5rem;">Outcome</div>
+
         <div class="form-group">
-            <label asp-for="SuccessStatus" class="form-label">Protocol Maintained?</label>
-            <select asp-for="SuccessStatus" class="form-input">
+            <label asp-for="SuccessStatus" class="form-label">
+                <span class="form-icon">🏆</span> Protocol Maintained?
+            </label>
+            <select asp-for="SuccessStatus" class="form-input" id="SuccessStatus">
                 <option value="true">✓ Yes — Fast Maintained</option>
                 <option value="false">✗ No — Fast Broken</option>
             </select>
@@ -55,14 +67,22 @@
         </div>
 
         <div class="form-group">
-            <label asp-for="Reflection" class="form-label">Reflection Notes <span class="optional">(optional)</span></label>
-            <textarea asp-for="Reflection" class="form-input form-textarea" rows="4" placeholder="How did it go? Any insights..."></textarea>
+            <label asp-for="Reflection" class="form-label">
+                <span class="form-icon">💭</span> Reflection Notes
+                <span class="optional">(optional)</span>
+            </label>
+            <textarea asp-for="Reflection" class="form-input form-textarea" id="Reflection"
+                      rows="4" placeholder="How did it go? Any insights or struggles..."></textarea>
             <span asp-validation-for="Reflection" class="validation-msg"></span>
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn-primary">Save Block</button>
-            <a asp-action="Index" class="btn-ghost">Cancel</a>
+            <button type="submit" class="btn-primary" id="create-submit-btn">Save Block</button>
+            <a asp-action="Index" class="btn-ghost" id="create-cancel-btn">Cancel</a>
         </div>
     </form>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

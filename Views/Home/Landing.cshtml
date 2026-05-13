@@ -1,0 +1,32 @@
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="hero">
+    <div class="hero-badge">Industry-Standard Habit Tracker</div>
+    <h1 class="hero-title">Build Habits That<br/><span class="accent">Actually Stick</span></h1>
+    <p class="hero-subtitle">Define recurring habits, track daily check-ins, and watch your streaks grow. Built for discipline — not motivation.</p>
+    <div class="hero-actions">
+        <a asp-area="Identity" asp-page="/Account/Register" class="btn-primary" id="hero-start-btn">
+            Get Started Free →
+        </a>
+        <a asp-area="Identity" asp-page="/Account/Login" class="btn-secondary" id="hero-login-btn">Sign In</a>
+    </div>
+    <div class="hero-stats">
+        <div class="stat-card" id="hero-stat-1">
+            <span class="stat-icon">🔥</span>
+            <div class="stat-label">Streak Tracking</div>
+            <div class="stat-desc">Current and all-time best streaks, per habit</div>
+        </div>
+        <div class="stat-card" id="hero-stat-2">
+            <span class="stat-icon">📅</span>
+            <div class="stat-label">Daily Check-ins</div>
+            <div class="stat-desc">One tap to mark done. No friction, no excuses</div>
+        </div>
+        <div class="stat-card" id="hero-stat-3">
+            <span class="stat-icon">📊</span>
+            <div class="stat-label">Heatmap Analytics</div>
+            <div class="stat-desc">12-week contribution graph per habit</div>
+        </div>
+    </div>
+</div>

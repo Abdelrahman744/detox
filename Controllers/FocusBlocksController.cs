@@ -99,7 +99,7 @@ public class FocusBlocksController : Controller
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!FocusBlockExists(focusBlock.Id))
+                if (!FocusBlockExists(focusBlock.Id, userId!))
                     return NotFound();
                 else
                     throw;
@@ -127,9 +127,9 @@ public class FocusBlocksController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    private bool FocusBlockExists(int id)
+    private bool FocusBlockExists(int id, string userId)
     {
-        return _context.FocusBlocks.Any(e => e.Id == id);
+        return _context.FocusBlocks.Any(e => e.Id == id && e.UserId == userId);
     }
 
 
@@ -157,6 +157,7 @@ public async Task<IActionResult> Analytics()
     foreach (var b in blocks)
     {
         if (b.DurationUnit == "Hours") totalHours += b.DurationValue;
+        else if (b.DurationUnit == "Minutes") totalHours += b.DurationValue / 60;
         else if (b.DurationUnit == "Days") totalHours += b.DurationValue * 24;
         else if (b.DurationUnit == "Months") totalHours += b.DurationValue * 720;
         else if (b.DurationUnit == "Seconds") totalHours += b.DurationValue / 3600;

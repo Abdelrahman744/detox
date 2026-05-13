@@ -1,0 +1,111 @@
+# Dopamine Detox Ledger — Full Audit & Redesign Plan
+
+## 🔴 Critical Issues
+
+### 1. Missing `UseAuthentication()` in Program.cs (SECURITY BUG)
+**File:** `Program.cs` line 34  
+The middleware pipeline calls `app.UseAuthorization()` but **never calls `app.UseAuthentication()`**.  
+In ASP.NET Core, Authentication must be registered before Authorization.  
+Without this, the Identity middleware does not populate `HttpContext.User`, meaning the `[Authorize]`
+attribute on `FocusBlocksController` may silently fail or behave unpredictably depending on the runtime version.  
+**Fix:** Add `app.UseAuthentication();` immediately before `app.UseAuthorization();`.
+
+### 2. `FocusBlockExists()` Missing User Ownership Check (SECURITY)
+**File:** `Controllers/FocusBlocksController.cs` line 130–133  
+```csharp
+private bool FocusBlockExists(int id)
+{
+    return _context.FocusBlocks.Any(e => e.Id == id); // ← no UserId check!
+}
+```
+This is used during `DbUpdateConcurrencyException` handling in Edit. Although the outer
+ownership check runs first, best practice demands this helper also validates ownership.  
+**Fix:** Add `UserId` parameter and filter by it.
+
+---
+
+## 🟡 Logic / UX Issues
+
+### 3. No Active Navigation Highlighting
+The nav has only "Archive" — no active state CSS class is applied. Users have no visual
+feedback about which page they're on. Analytics and "Log New Block" are also completely
+absent from the nav, making them unreachable except via the Archive page.
+
+### 4. Analytics Page Reuses `.hero` / `.hero-stats` with Inline Style Hacks
+The analytics page abuses the hero layout with `style="padding: 2rem 0;"` overrides — this is fragile and breaks separation of concerns.
+
+### 5. "Seconds" as a Duration Unit is Oddly Placed
+In the dropdown: Seconds → Hours → Days → Months. "Seconds" should either be removed or placed logically (Seconds, Minutes, Hours, Days, Months).
+
+### 6. Missing "Minutes" Duration Unit
+There is no "Minutes" option in the Create/Edit forms, only Seconds/Hours/Days/Months.
+
+### 7. Analytics Computes on Every Request with No Caching
+Minor: all analytics are recomputed from raw DB on every page load. For a small app this is fine, but it's worth noting.
+
+### 8. No Footer in Layout
+The `.app-footer` CSS class exists but the layout never renders a `<footer>` element.
+
+---
+
+## 🟢 Design Issues (All Pages)
+
+### Current State
+The existing design is a "Spotify dark clone" — functional but generic. Opportunities:
+- No active nav state
+- Analytics page is bare: 3 emoji-icon cards, no data visualization
+- Hero page has no visual depth (no gradients, no animated elements)
+- Forms have no progressive disclosure or visual delight
+- No page-entry animations
+- Table rows are dense with no breathing room
+- No streak / trend visualization
+
+---
+
+## ✅ Implementation Plan
+
+### Phase 1 — Bug Fixes (Program.cs, Controller)
+- [ ] Add `app.UseAuthentication()` before `app.UseAuthorization()` in Program.cs
+- [ ] Fix `FocusBlockExists()` to scope by UserId
+- [ ] Add "Minutes" duration unit option
+
+### Phase 2 — Layout & Nav Overhaul (_Layout.cshtml)
+- [ ] Add Analytics and "Log Block" nav links (visible when signed in)
+- [ ] Add active page detection via `ViewContext.RouteData`
+- [ ] Glassmorphism sticky header with backdrop-blur
+- [ ] Add a footer element
+
+### Phase 3 — Premium Design System (site.css)
+New color palette: deep midnight dark + vibrant violet accent + emerald success  
+- [ ] New CSS custom properties
+- [ ] Card components with gradient border effect
+- [ ] Glassmorphism utility classes
+- [ ] Gradient text utilities
+- [ ] Smooth page-entry animation (`@keyframes fadeInUp`)
+- [ ] Stat card with number counter animation
+- [ ] CSS-only progress ring for Analytics
+- [ ] Full mobile responsiveness pass
+
+### Phase 4 — Page Redesigns (Views/)
+- [ ] **Home/Index** — cinematic hero with animated gradient background, floating stat cards
+- [ ] **FocusBlocks/Index** — improved table with pill badges, better empty state, row animations
+- [ ] **FocusBlocks/Create** — premium form card with icon-labeled fields
+- [ ] **FocusBlocks/Edit** — same treatment as Create
+- [ ] **FocusBlocks/Analytics** — CSS progress ring for win rate, large animated numbers, colored stat cards
+
+---
+
+## File Change Summary
+
+| File | Change Type |
+|---|---|
+| `Program.cs` | Bug fix |
+| `Controllers/FocusBlocksController.cs` | Security fix + minutes unit |
+| `Views/Shared/_Layout.cshtml` | Full redesign |
+| `Views/Home/Index.cshtml` | Full redesign |
+| `Views/FocusBlocks/Index.cshtml` | Full redesign |
+| `Views/FocusBlocks/Create.cshtml` | Full redesign |
+| `Views/FocusBlocks/Edit.cshtml` | Full redesign |
+| `Views/FocusBlocks/Analytics.cshtml` | Full redesign |
+| `wwwroot/css/site.css` | Complete overhaul |
+| `wwwroot/js/site.js` | Add counter animation JS |
